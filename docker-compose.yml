@@ -1,0 +1,130 @@
+version: '3.8'
+services:
+
+  # These are the configurations for our Node app
+  # When Docker Compose starts this container it will automatically
+  # use the Dockerfile in the directory to configure it
+  redis:
+    image: redis
+    restart: always
+    hostname: redis
+    expose:
+      - 6379
+    ports:
+      - "6379:6379"
+    environment:
+      - REDIS_HOST=redis
+    
+      
+  
+  tenants:
+    container_name: tenants
+    build: /tenants
+    depends_on:
+      # Our app does not work without our database
+      # so this ensures our database is loaded first
+      - postgres
+      - redis
+    ports:
+      - "3000:3000"
+    volumes:
+      # Maps our current project directory `.` to
+      # our working directory in the container
+      - ./:/usr/src/app/
+      # node_modules workaround for volumes
+      # https://stackoverflow.com/a/32785014
+      - /usr/src/app/node_modules
+
+    environment:
+      - REDIS_HOST=redis
+    links: 
+      - redis
+   
+      
+    
+  # This is the configuration for our PostgreSQL database container
+  # Note the `postgres` name is important, in out Node app when we refer
+  # to  `host: "postgres"` that value is mapped on the network to the 
+  # address of this container.
+# This is the configuration for our PostgreSQL database container
+  # Note the `postgres` name is important, in out Node app when we refer
+  # to  `host: "postgres"` that value is mapped on the network to the 
+  # address of this container.
+  employees:
+    container_name: employees
+    build: /employees
+    depends_on:
+      # Our app does not work without our database
+      # so this ensures our database is loaded first
+      - postgres
+      - tenants
+      # - redis
+    ports:
+      - "3001:3000"
+    # volumes:
+    #   # Maps our current project directory `.` to
+    #   # our working directory in the container
+    #   - ./:/usr/src/app/
+    #   # node_modules workaround for volumes
+    #   # https://stackoverflow.com/a/32785014
+    #   - /usr/src/app/node_modules
+
+    # environment:
+    #   - REDIS_HOST=redis
+    links: 
+      - tenants
+   
+  postgres:
+        image: postgres:14.1-alpine
+        restart: always
+        environment:
+          # You can set the value of environment variables
+      # in your docker-compose.yml file
+      # Our Node app will use these to connect
+      # to the database
+            - POSTGRES_USER=root
+            - POSTGRES_PASSWORD=mascholarapp
+            - POSTGRES_DB=scholarmediamultitenant
+        ports: 
+         # Standard port for PostgreSQL databases
+            - 5432:5432
+        logging:
+            options:
+                max-size: 10m
+                max-file: "3"
+        depends_on:
+             - redis
+        links:
+             - redis
+       
+  pgadmin: 
+        image: dpage/pgadmin4
+        environment: 
+            - PGADMIN_DEFAULT_EMAIL=scholarmedia@example.com
+            - PGADMIN_DEFAULT_PASSWORD=scpassword123
+        ports:
+      # PostgreSQL pgAdmin panel accessible at http://localhost:16543/
+            - "16543:80"
+        depends_on:
+           - postgres
+           - redis
+        links:
+           - redis
+       
+  nginx:
+    image: nginx:latest
+    ports:
+      - "8080:8080"
+    volumes:
+      - ./nginx/nginx.conf:/etc/nginx/nginx.conf:ro
+    depends_on:
+      - employees
+      - tenants
+    
+volumes:
+  db:
+    driver: local
+
+
+
+  

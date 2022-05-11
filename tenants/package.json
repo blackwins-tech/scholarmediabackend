@@ -1,0 +1,33 @@
+{
+  "name": "tenants",
+  "version": "1.0.0",
+  "description": "multitenant architecture with postgres,microservice and docker",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "BWT",
+  "license": "ISC",
+  "dependencies": {
+    "body-parser": "^1.20.0",
+    "bull": "^4.8.2",
+    "continuation-local-storage": "^3.2.1",
+    "cors": "^2.8.5",
+    "dotenv": "^16.0.0",
+    "express": "^4.18.1",
+    "express-response-formatter": "^2.0.2",
+    "express-sanitizer": "^1.0.6",
+    "fs": "^0.0.1-security",
+    "generate-password": "^1.7.0",
+    "joi": "^17.6.0",
+    "knex": "^2.0.0",
+    "nodemon": "^2.0.16",
+    "path": "^0.12.7",
+    "pg": "^8.7.3",
+    "queue": "^6.0.2",
+    "redis": "^4.1.0",
+    "sequelize": "^6.19.0",
+    "slugify": "^1.6.5",
+    "uuid": "^8.3.2"
+  }
+}
