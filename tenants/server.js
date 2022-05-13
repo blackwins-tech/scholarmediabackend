@@ -3,15 +3,11 @@ const express = require("express");
 const fs = require("fs");
 const redis = require("redis");
 const path = require("path");
+const cors = require("cors");
 const { responseEnhancer } = require("express-response-formatter");
 const sanitize = require("express-sanitizer");
 const { bootstrap } = require("./service/connection-service");
-const cors = require("cors");
-
-// const client = redis.createClient({
-//     host: 'redis',
-//     port: 6379
-// })
+const bodyParser = require("body-parser");
 
 const PORT = process.env.PORT || 3000;
 const BASE_URL = `/api/${process.env.VERSION || "v1"}`;
@@ -22,6 +18,13 @@ app.use(express.urlencoded({ extended: true }));
 app.use(sanitize());
 app.use(responseEnhancer());
 app.use(cors());
+// parse requests of content-type - application/x-www-form-urlencoded
+app.use(bodyParser.urlencoded({ extended: true }));
+
+// parse requests of content-type - application/json
+app.use(bodyParser.json());
+
+//CORS-HEADERS- Required for cross origin and cross server communication
 app.use((req, res, next) => {
   res.setHeader("Access-Control_Allow-Origin", "*");
   res.setHeader(
@@ -39,9 +42,13 @@ app.use((req, res, next) => {
   );
   next();
 });
+
 bootstrap();
 
-app.get("/", (req, res, next) => res.send("success"));
+// define a root route
+app.get("/", (req, res, next) => {
+  res.send("Hai Welcome To Our scholar Tenants APP!");
+});
 
 fs.readdir(path.join(__dirname, "routes"), (err, files) => {
   if (err) console.error("error in index readdir" + err);

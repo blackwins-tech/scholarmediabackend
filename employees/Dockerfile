@@ -1,9 +1,11 @@
 FROM node:14-alpine3.12
-RUN mkdir -p usr/src/app/node_modules && chown -R node:node usr/src/app
-WORKDIR /usr/src/app
-COPY package*.json ./
-USER node
+RUN mkdir -p /usr/src/employees
+WORKDIR /usr/src/employees
+ENV PATH /usr/src/node_modules/.bin:$PATH
+# Install app dependencies
+COPY package.json /usr/src/package.json
 RUN npm install
-COPY --chown=node:node . .
-EXPOSE 3001
+# Bundle app source
+COPY . .
+EXPOSE 3000
 CMD [ "node", "server.js" ]

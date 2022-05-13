@@ -26,11 +26,11 @@ const store = async (req, res) => {
     db_username: tenantName,
     db_password: password,
   };
-  const tenantRes = await db("tenants").insert(tenant);
+  await db("tenants").insert(tenant);
   await up({ tenantName, password, uuid });
 
-  //return res.formatter.ok({ tenant: { ...tenant } })
-  return res.formatter.ok(tenantRes);
+  return res.formatter.ok({ tenant: { ...tenant } });
+  //return res.formatter.ok(tenantRes)
 };
 
 const destroy = async (req, res) => {
@@ -52,22 +52,31 @@ const destroy = async (req, res) => {
 
   return res.formatter.ok({ message: "tenant was deleted successfully" });
 };
-const viewbyid = async (req, res) => {
+const index2 = async (req, res) => {
   const {
     body: { uuid },
   } = req;
+
   console.log("uuid" + uuid);
 
-  const tenant = await db
+  var tenant = await db
     .select("db_name", "db_username", "uuid")
     .where("uuid", uuid)
     .from("tenants");
   return res.send(tenant);
-  /* old commented */
-  // await conn.where(uuid).from("tenants").select();
-  //await conn.select("*").from("tenants").where(uuid);
-  // const staff = await seed()
-  // console.log("staff controller"+staff);
-  // return res.formatter.ok({ staff})
 };
-module.exports = { index, store, destroy, viewbyid };
+
+const index3 = async (req, res) => {
+  const {
+    params: { uuid },
+  } = req;
+
+  console.log("uuid" + uuid);
+
+  var tenant = await db
+    .update("db_name", "db_username", "uuid")
+    .where("uuid", uuid)
+    .from("tenants");
+  return res.send(tenant);
+};
+module.exports = { index, store, destroy, index2, index3 };
