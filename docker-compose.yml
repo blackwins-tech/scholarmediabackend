@@ -19,7 +19,7 @@ services:
   
   tenants:
     container_name: tenants
-    build: /tenants
+    build: tenants/.
     depends_on:
       # Our app does not work without our database
       # so this ensures our database is loaded first
@@ -52,7 +52,7 @@ services:
   # address of this container.
   employees:
     container_name: employees
-    build: /employees
+    build: employees/.
     depends_on:
       # Our app does not work without our database
       # so this ensures our database is loaded first
